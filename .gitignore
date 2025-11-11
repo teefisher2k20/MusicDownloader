@@ -1,0 +1,127 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.venv/
+venv/
+ENV/
+env/
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+.next/
+out/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+.jest/
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Downloaded files
+downloads/
+uploads/
+media/
+
+# AI Models (large files)
+models/
+*.pth
+*.onnx
+*.pb
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# System files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# MacOS
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Certificates & Keys
+*.pem
+*.key
+*.cert
+*.p12
+cdm/
+
+# Build artifacts
+*.min.js
+*.min.css
+*.map
+
+# Documentation builds
+docs/_build/
+site/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional
+.npmrc
+.yarnrc

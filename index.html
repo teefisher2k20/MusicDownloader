@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Universal Media Downloader, Converter, and Manager Plus - Download from 1100+ websites, convert media, and manage your content with AI-powered tools">
+    <meta name="keywords" content="video downloader, media converter, YouTube downloader, TikTok downloader, AI video enhancer">
+    <title>UMDM+ | Universal Media Downloader & Converter</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+</head>
+<body class="light-theme">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40">
+                        <rect width="40" height="40" rx="8" fill="url(#gradient)"/>
+                        <path d="M20 10L15 15L20 20L15 25L20 30" stroke="white" stroke-width="2" fill="none"/>
+                        <path d="M25 15L30 20L25 25" stroke="white" stroke-width="2" fill="none"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#2563eb"/>
+                                <stop offset="100%" style="stop-color:#7c3aed"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">UMDM<span class="logo-plus">+</span></span>
+                </div>
+                
+                <nav class="nav">
+                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#supported-sites" class="nav-link">Sites</a>
+                    <a href="#help" class="nav-link">Help</a>
+                </nav>
+                
+                <div class="header-actions">
+                    <button class="btn-icon" id="themeToggle" aria-label="Toggle theme">
+                        <svg class="icon-sun" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" id="settingsBtn" aria-label="Settings">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Download, Convert & Manage Media<br>
+                        <span class="gradient-text">From 1,100+ Websites</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        The ultimate all-in-one platform with AI-powered tools. Download in 8K, convert any format, and enhance with professional features - completely free.
+                    </p>
+                    
+                    <!-- Main Download Form -->
+                    <div class="download-card">
+                        <div class="url-input-wrapper">
+                            <input 
+                                type="text" 
+                                id="urlInput" 
+                                class="url-input" 
+                                placeholder="Paste video or audio URL here (YouTube, TikTok, Instagram, and 1,100+ more sites)"
+                                autocomplete="off"
+                            >
+                            <button class="btn-paste" id="pasteBtn" title="Paste from clipboard">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="download-options" id="downloadOptions" style="display: none;">
+                            <div class="options-grid">
+                                <div class="option-group">
+                                    <label>Quality</label>
+                                    <select id="qualitySelect" class="select-input">
+                                        <option value="auto">Auto (Best Available)</option>
+                                        <option value="8k">8K (7680×4320)</option>
+                                        <option value="4k">4K UHD (3840×2160)</option>
+                                        <option value="1440p">1440p (2K)</option>
+                                        <option value="1080p" selected>1080p Full HD</option>
+                                        <option value="720p">720p HD</option>
+                                        <option value="480p">480p SD</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="option-group">
+                                    <label>Format</label>
+                                    <select id="formatSelect" class="select-input">
+                                        <option value="mp4" selected>MP4 (Video)</option>
+                                        <option value="mkv">MKV (Video)</option>
+                                        <option value="webm">WebM (Video)</option>
+                                        <option value="mp3">MP3 (Audio Only)</option>
+                                        <option value="m4a">M4A (Audio Only)</option>
+                                        <option value="flac">FLAC (Audio Only)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="option-group">
+                                    <label>Audio Quality</label>
+                                    <select id="audioQualitySelect" class="select-input">
+                                        <option value="320" selected>320 kbps</option>
+                                        <option value="256">256 kbps</option>
+                                        <option value="192">192 kbps</option>
+                                        <option value="128">128 kbps</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="advanced-options-toggle">
+                                <button class="btn-text" id="advancedToggle">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                                    </svg>
+                                    Advanced Options
+                                </button>
+                            </div>
+                            
+                            <div class="advanced-options" id="advancedOptions" style="display: none;">
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="subtitlesCheck" checked>
+                                        <span>Download Subtitles</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="thumbnailCheck">
+                                        <span>Download Thumbnail</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="metadataCheck" checked>
+                                        <span>Preserve Metadata</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="removeAdsCheck" checked>
+                                        <span>Remove Ads</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="trim-section">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="trimCheck">
+                                        <span>Trim Video (Pre-Download)</span>
+                                    </label>
+                                    <div class="trim-inputs" id="trimInputs" style="display: none;">
+                                        <input type="text" placeholder="Start time (HH:MM:SS)" id="trimStart" class="time-input">
+                                        <input type="text" placeholder="End time (HH:MM:SS)" id="trimEnd" class="time-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-primary btn-large" id="downloadBtn">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download Now
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">1,100+</div>
+                            <div class="stat-label">Supported Sites</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">8K</div>
+                            <div class="stat-label">Max Resolution</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">100+</div>
+                            <div class="stat-label">Formats</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">AI</div>
+                            <div class="stat-label">Powered Tools</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="container">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-subtitle">Everything you need in one platform</p>
+                
+                <div class="features-grid">
+                    <!-- Feature 1 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Multi-Source Downloads</h3>
+                        <p class="feature-description">Download from YouTube, TikTok, Instagram, Facebook, Twitter, and 1,100+ other platforms. Support for DRM-protected content from Netflix, Prime Video, Disney+.</p>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">8K Quality Support</h3>
+                        <p class="feature-description">Download videos in up to 8K resolution with multi-threaded technology for maximum speed. Support for 4K, 1080p, 720p, and all standard formats.</p>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 7h12M8 12h12M8 17h12M3 7h.01M3 12h.01M3 17h.01"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Batch Processing</h3>
+                        <p class="feature-description">Download entire playlists, channels, or search results. Process up to 100 videos simultaneously with intelligent queue management.</p>
+                    </div>
+                    
+                    <!-- Feature 4 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Format Conversion</h3>
+                        <p class="feature-description">Convert between 100+ formats: MP4, MKV, AVI, WebM, MP3, FLAC, WAV. Support for H.265, H.264, AV1, VP9 codecs.</p>
+                    </div>
+                    
+                    <!-- Feature 5 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">AI Enhancement</h3>
+                        <p class="feature-description">AI-powered video upscaling to 8K, vocal removal, speech-to-text transcription with 99% accuracy, and auto scene detection.</p>
+                    </div>
+                    
+                    <!-- Feature 6 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Video Editing Tools</h3>
+                        <p class="feature-description">Trim before download, merge videos, remove watermarks, add subtitles, screen recording in 4K, and create slideshows.</p>
+                    </div>
+                    
+                    <!-- Feature 7 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Smart Mode</h3>
+                        <p class="feature-description">One-click preset configuration. Set your preferences once and every download automatically applies your settings.</p>
+                    </div>
+                    
+                    <!-- Feature 8 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Legal Compliance</h3>
+                        <p class="feature-description">Creative Commons filter, attribution tools, mandatory deletion management for educational content, and fair use assistant.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section class="tools">
+            <div class="container">
+                <h2 class="section-title">Professional Tools</h2>
+                <div class="tools-tabs">
+                    <button class="tool-tab active" data-tab="ai">AI Tools</button>
+                    <button class="tool-tab" data-tab="convert">Conversion</button>
+                    <button class="tool-tab" data-tab="edit">Editing</button>
+                    <button class="tool-tab" data-tab="manage">Management</button>
+                </div>
+                
+                <!-- AI Tools Tab -->
+                <div class="tool-content active" id="ai-tab">
+                    <div class="tool-grid">
+                        <div class="tool-item">
+                            <h4>🎨 Video Upscaler</h4>
+                            <p>Enhance video quality up to 8K resolution using AI</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🎤 Speech to Text</h4>
+                            <p>Transcribe audio with 99% accuracy in 50+ languages</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🎵 Vocal Remover</h4>
+                            <p>Extract vocals or instrumentals from any song</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>✂️ Auto Scene Splitter</h4>
+                            <p>Automatically detect and split video scenes</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Conversion Tab -->
+                <div class="tool-content" id="convert-tab">
+                    <div class="tool-grid">
+                        <div class="tool-item">
+                            <h4>🎬 Video Converter</h4>
+                            <p>Convert between 50+ video formats (MP4, MKV, AVI, WebM)</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🎧 Audio Converter</h4>
+                            <p>Convert audio files (MP3, FLAC, WAV, OGG, M4A)</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>📉 Video Compressor</h4>
+                            <p>Reduce file size while maintaining quality</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🎯 Codec Converter</h4>
+                            <p>Switch between H.265, H.264, AV1, VP9</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Editing Tab -->
+                <div class="tool-content" id="edit-tab">
+                    <div class="tool-grid">
+                        <div class="tool-item">
+                            <h4>✂️ Video Trimmer</h4>
+                            <p>Cut and trim videos with precision</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🔗 Video Merger</h4>
+                            <p>Combine multiple videos into one file</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🚫 Watermark Remover</h4>
+                            <p>Remove watermarks from videos using AI</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>💬 Subtitle Editor</h4>
+                            <p>Add, edit, and sync subtitles (50+ languages)</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>📽️ Slideshow Maker</h4>
+                            <p>Create videos from images with transitions</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🎥 Screen Recorder</h4>
+                            <p>Record screen in 4K with unlimited time</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Management Tab -->
+                <div class="tool-content" id="manage-tab">
+                    <div class="tool-grid">
+                        <div class="tool-item">
+                            <h4>📋 Batch Downloader</h4>
+                            <p>Download entire playlists and channels</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>⚡ Smart Mode</h4>
+                            <p>Configure one-click download presets</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>🔔 Auto-Subscription</h4>
+                            <p>Auto-download new channel videos</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                        <div class="tool-item">
+                            <h4>📊 Download Manager</h4>
+                            <p>Manage queue, history, and settings</p>
+                            <button class="btn-secondary">Launch Tool</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Queue Section -->
+        <section class="queue-section" id="queue">
+            <div class="container">
+                <div class="queue-header">
+                    <h2>Download Queue</h2>
+                    <div class="queue-actions">
+                        <button class="btn-text" id="clearCompletedBtn">Clear Completed</button>
+                        <button class="btn-text" id="pauseAllBtn">Pause All</button>
+                    </div>
+                </div>
+                
+                <div class="queue-tabs">
+                    <button class="queue-tab active" data-queue="active">Active (0)</button>
+                    <button class="queue-tab" data-queue="pending">Pending (0)</button>
+                    <button class="queue-tab" data-queue="completed">Completed (0)</button>
+                    <button class="queue-tab" data-queue="failed">Failed (0)</button>
+                </div>
+                
+                <div class="queue-list" id="queueList">
+                    <div class="empty-state">
+                        <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <p>No downloads yet</p>
+                        <span>Paste a URL above to start downloading</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supported Sites Section -->
+        <section class="supported-sites" id="supported-sites">
+            <div class="container">
+                <h2 class="section-title">Supported Platforms</h2>
+                <p class="section-subtitle">Download from 1,100+ websites including:</p>
+                
+                <div class="site-categories">
+                    <div class="site-category">
+                        <h3>🎬 Video Platforms</h3>
+                        <div class="site-tags">
+                            <span class="site-tag">YouTube</span>
+                            <span class="site-tag">Vimeo</span>
+                            <span class="site-tag">Dailymotion</span>
+                            <span class="site-tag">TikTok</span>
+                            <span class="site-tag">Facebook</span>
+                            <span class="site-tag">Instagram</span>
+                            <span class="site-tag">Twitter</span>
+                            <span class="site-tag">Twitch</span>
+                            <span class="site-tag">Reddit</span>
+                            <span class="site-tag">LinkedIn</span>
+                        </div>
+                    </div>
+                    
+                    <div class="site-category">
+                        <h3>🎭 Streaming Services</h3>
+                        <div class="site-tags">
+                            <span class="site-tag">Netflix</span>
+                            <span class="site-tag">Amazon Prime</span>
+                            <span class="site-tag">Disney+</span>
+                            <span class="site-tag">HBO Max</span>
+                            <span class="site-tag">Hulu</span>
+                            <span class="site-tag">Paramount+</span>
+                            <span class="site-tag">Crunchyroll</span>
+                            <span class="site-tag">Apple TV+</span>
+                        </div>
+                    </div>
+                    
+                    <div class="site-category">
+                        <h3>🎵 Music Platforms</h3>
+                        <div class="site-tags">
+                            <span class="site-tag">SoundCloud</span>
+                            <span class="site-tag">Spotify</span>
+                            <span class="site-tag">Apple Music</span>
+                            <span class="site-tag">Bandcamp</span>
+                            <span class="site-tag">Mixcloud</span>
+                            <span class="site-tag">YouTube Music</span>
+                        </div>
+                    </div>
+                    
+                    <div class="site-category">
+                        <h3>📚 Educational</h3>
+                        <div class="site-tags">
+                            <span class="site-tag">Coursera</span>
+                            <span class="site-tag">Udemy</span>
+                            <span class="site-tag">Khan Academy</span>
+                            <span class="site-tag">TED Talks</span>
+                            <span class="site-tag">LinkedIn Learning</span>
+                            <span class="site-tag">Teacher Tube</span>
+                        </div>
+                    </div>
+                    
+                    <div class="site-category">
+                        <h3>🌏 Asian Platforms</h3>
+                        <div class="site-tags">
+                            <span class="site-tag">Bilibili</span>
+                            <span class="site-tag">Naver TV</span>
+                            <span class="site-tag">Youku</span>
+                            <span class="site-tag">Niconico</span>
+                            <span class="site-tag">iQIYI</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-secondary">View All 1,100+ Supported Sites</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>UMDM+</h4>
+                    <p>The ultimate universal media downloader, converter, and manager with AI-powered tools.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li><a href="#download">Download Videos</a></li>
+                        <li><a href="#convert">Convert Media</a></li>
+                        <li><a href="#ai">AI Enhancement</a></li>
+                        <li><a href="#edit">Video Editing</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#compliance">Legal Compliance</a></li>
+                        <li><a href="#dmca">DMCA</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#help">Help Center</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#api">API Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 UMDM+. All rights reserved.</p>
+                <p>Educational and personal use only. Respect copyright laws and platform terms of service.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals & Overlays -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <h4>Default Download Settings</h4>
+                    <label>Default Quality</label>
+                    <select class="select-input">
+                        <option value="1080p">1080p Full HD</option>
+                        <option value="4k">4K UHD</option>
+                        <option value="8k">8K</option>
+                    </select>
+                    
+                    <label>Default Format</label>
+                    <select class="select-input">
+                        <option value="mp4">MP4</option>
+                        <option value="mkv">MKV</option>
+                        <option value="webm">WebM</option>
+                    </select>
+                    
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked>
+                        <span>Enable Smart Mode</span>
+                    </label>
+                    
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked>
+                        <span>Enable Clipboard Monitor</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
