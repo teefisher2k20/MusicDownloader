@@ -117,10 +117,10 @@ site/
 *.backup
 *~
 
-# Package managers
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# Package managers (optional - keep lockfiles for reproducible builds)
+# package-lock.json (DO NOT ignore - needed for CI)
+# yarn.lock
+# pnpm-lock.yaml
 
 # Optional
 .npmrc
