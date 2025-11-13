@@ -118,7 +118,7 @@ site/
 *~
 
 # Package managers (optional - keep lockfiles for reproducible builds)
-# package-lock.json (DO NOT ignore - needed for CI)
+# package-lock.json (Keep this commented out to track package-lock.json in version control; needed for CI)
 # yarn.lock
 # pnpm-lock.yaml
 

@@ -134,8 +134,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run npm audit
-        run: npm audit --audit-level=moderate
+      - name: Run dependency audit
+        run: |
+          if [ -f package-lock.json ]; then
+            npm audit --audit-level=moderate
+          elif [ -f yarn.lock ]; then
+            yarn audit --level moderate || true
+          else
+            echo "No lockfile found; skipping dependency audit."
+          fi
         continue-on-error: true
 
       - name: Run Snyk
