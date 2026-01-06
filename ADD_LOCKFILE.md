@@ -39,8 +39,8 @@ Re-run CI.
     if [ -f yarn.lock ]; then
       echo "yarn.lock found — running yarn install"
       yarn install --frozen-lockfile
-    elif [ -f package-lock.json ]; then
-      echo "package-lock.json found — running npm ci"
+    elif [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+      echo "npm lockfile found — running npm ci"
       npm ci
     elif [ -f package.json ]; then
       echo "No lockfile found — running npm install (will generate package-lock.json locally)"
