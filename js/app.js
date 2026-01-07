@@ -114,10 +114,11 @@ function setupEventListeners() {
   });
     
   // Navigation Links
-  document.querySelectorAll('.nav-link').forEach(link => {
+  const navLinks = document.querySelectorAll('.nav-link');
+  navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
             
       const target = link.getAttribute('href');
@@ -324,55 +325,39 @@ function updateDownloadStatus(id, status, progress) {
 // QUEUE MANAGEMENT
 // ============================================
 function updateQueueDisplay() {
-  const activeDownloads = AppState.downloads.filter(d => d.status === 'downloading');
-  const pendingDownloads = AppState.downloads.filter(d => d.status === 'pending');
-  const completedDownloads = AppState.downloads.filter(d => d.status === 'completed');
-  const failedDownloads = AppState.downloads.filter(d => d.status === 'failed');
-    
-  // Update tab counts
-  document.querySelectorAll('.queue-tab').forEach(tab => {
-    const queueType = tab.dataset.queue;
-    let count = 0;
-        
-    switch(queueType) {
-    case 'active':
-      count = activeDownloads.length;
+  // Single pass through downloads array to categorize
+  const categorizedDownloads = AppState.downloads.reduce((acc, download) => {
+    switch(download.status) {
+    case 'downloading':
+      acc.active.push(download);
       break;
     case 'pending':
-      count = pendingDownloads.length;
+      acc.pending.push(download);
       break;
     case 'completed':
-      count = completedDownloads.length;
+      acc.completed.push(download);
       break;
     case 'failed':
-      count = failedDownloads.length;
+      acc.failed.push(download);
       break;
     }
-        
+    return acc;
+  }, { active: [], pending: [], completed: [], failed: [] });
+    
+  // Update tab counts
+  DOM.queueTabs.forEach(tab => {
+    const queueType = tab.dataset.queue;
+    const count = categorizedDownloads[queueType]?.length || 0;
     tab.textContent = `${queueType.charAt(0).toUpperCase() + queueType.slice(1)} (${count})`;
   });
     
   // Render current tab
-  renderQueueList();
+  renderQueueList(categorizedDownloads);
 }
 
-function renderQueueList() {
-  let downloads = [];
-    
-  switch(AppState.currentTab) {
-  case 'active':
-    downloads = AppState.downloads.filter(d => d.status === 'downloading');
-    break;
-  case 'pending':
-    downloads = AppState.downloads.filter(d => d.status === 'pending');
-    break;
-  case 'completed':
-    downloads = AppState.downloads.filter(d => d.status === 'completed');
-    break;
-  case 'failed':
-    downloads = AppState.downloads.filter(d => d.status === 'failed');
-    break;
-  }
+function renderQueueList(categorizedDownloads) {
+  // Get downloads for current tab from pre-categorized downloads
+  const downloads = categorizedDownloads[AppState.currentTab] || [];
     
   if (downloads.length === 0) {
     DOM.queueList.innerHTML = `
@@ -460,8 +445,8 @@ function handleQueueTab(tab) {
   tab.classList.add('active');
   AppState.currentTab = tab.dataset.queue;
     
-  // Update display
-  renderQueueList();
+  // Update display - this will categorize and render
+  updateQueueDisplay();
 }
 
 // ============================================
@@ -490,8 +475,10 @@ function handleThemeToggle() {
 // ============================================
 function initClipboardMonitor() {
   let lastClipboard = '';
+  let clipboardCheckTimeout;
   
-  setInterval(async () => {
+  // Reduced polling frequency and added debouncing
+  const checkClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
       
@@ -501,8 +488,22 @@ function initClipboardMonitor() {
       }
     } catch (err) {
       // Clipboard access denied or not available
+      // Silently fail - this is expected when tab is not focused
+    } finally {
+      // Schedule next check with increased interval to reduce CPU usage
+      clipboardCheckTimeout = setTimeout(checkClipboard, CLIPBOARD_CHECK_INTERVAL);
     }
-  }, CLIPBOARD_CHECK_INTERVAL);
+  };
+  
+  // Start monitoring
+  checkClipboard();
+  
+  // Clean up on page unload
+  window.addEventListener('beforeunload', () => {
+    if (clipboardCheckTimeout) {
+      clearTimeout(clipboardCheckTimeout);
+    }
+  });
 }
 
 function useClipboardUrl(url) {

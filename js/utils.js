@@ -8,7 +8,7 @@
  * @returns {string} Unique identifier
  */
 function generateId() {
-  return '_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+  return '_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
 }
 
 /**
