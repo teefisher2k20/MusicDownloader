@@ -356,16 +356,8 @@ function updateQueueDisplay() {
 }
 
 function renderQueueList(categorizedDownloads) {
-  const downloads = categorizedDownloads?.[AppState.currentTab] || 
-                    AppState.downloads.filter(d => {
-                      switch(AppState.currentTab) {
-                      case 'active': return d.status === 'downloading';
-                      case 'pending': return d.status === 'pending';
-                      case 'completed': return d.status === 'completed';
-                      case 'failed': return d.status === 'failed';
-                      default: return false;
-                      }
-                    });
+  // Get downloads for current tab from pre-categorized downloads
+  const downloads = categorizedDownloads[AppState.currentTab] || [];
     
   if (downloads.length === 0) {
     DOM.queueList.innerHTML = `

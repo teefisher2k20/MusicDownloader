@@ -27,12 +27,22 @@ function loadSettings() {
   try {
     const savedSettings = localStorage.getItem('umdm_settings');
     if (savedSettings) {
-      AppState.settings = { ...AppState.settings, ...JSON.parse(savedSettings) };
+      const parsed = JSON.parse(savedSettings);
+      // Validate that parsed settings have expected structure
+      if (parsed && typeof parsed === 'object') {
+        // Merge with defaults to ensure all required properties exist
+        AppState.settings = { ...AppState.settings, ...parsed };
+      }
     }
   } catch (error) {
     // Handle corrupted localStorage data gracefully
     console.error('Failed to load settings:', error);
-    localStorage.removeItem('umdm_settings');
+    // Only remove if it's a parse error (corrupted data)
+    if (error instanceof SyntaxError) {
+      console.warn('Removing corrupted settings data');
+      localStorage.removeItem('umdm_settings');
+    }
+    // For other errors (like SecurityError), keep the data
   }
 }
 

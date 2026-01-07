@@ -44,13 +44,23 @@ function showClipboardNotification(url) {
   
   const notification = document.createElement('div');
   notification.className = 'clipboard-notification';
-  // Escape URL to prevent XSS
-  const escapedUrl = url.replace(/'/g, '&#39;');
-  notification.innerHTML = `
-    <p>URL detected in clipboard</p>
-    <button onclick="window.useClipboardUrl('${escapedUrl}')">Add to Download</button>
-    <button onclick="window.dismissNotification(this)">Dismiss</button>
-  `;
+  
+  // Create elements safely to prevent XSS
+  const message = document.createElement('p');
+  message.textContent = 'URL detected in clipboard';
+  
+  const addButton = document.createElement('button');
+  addButton.textContent = 'Add to Download';
+  addButton.onclick = () => window.useClipboardUrl(url);
+  
+  const dismissButton = document.createElement('button');
+  dismissButton.textContent = 'Dismiss';
+  dismissButton.onclick = function () { window.dismissNotification(this); };
+  
+  notification.appendChild(message);
+  notification.appendChild(addButton);
+  notification.appendChild(dismissButton);
+  
   document.body.appendChild(notification);
   
   setTimeout(() => notification.remove(), 10000);
