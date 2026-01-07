@@ -445,8 +445,8 @@ function handleQueueTab(tab) {
   tab.classList.add('active');
   AppState.currentTab = tab.dataset.queue;
     
-  // Update display
-  renderQueueList();
+  // Update display - this will categorize and render
+  updateQueueDisplay();
 }
 
 // ============================================

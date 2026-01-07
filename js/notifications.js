@@ -55,7 +55,7 @@ function showClipboardNotification(url) {
   
   const dismissButton = document.createElement('button');
   dismissButton.textContent = 'Dismiss';
-  dismissButton.onclick = function () { window.dismissNotification(this); };
+  dismissButton.onclick = () => window.dismissNotification(dismissButton);
   
   notification.appendChild(message);
   notification.appendChild(addButton);
