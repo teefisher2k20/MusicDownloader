@@ -20,7 +20,8 @@ const notFoundHandler = (req, res) => {
  * Global error handler
  * Must have 4 parameters for Express to recognize it as error middleware
  */
-const errorHandler = (err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+const errorHandler = (err, req, res, next) => {
   // Log error for debugging
   console.error('Error:', {
     message: err.message,

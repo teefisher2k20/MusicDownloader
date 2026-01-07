@@ -5,6 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
+const { SUPPORTED_SITES } = require('../config/constants');
 
 /**
  * Health check endpoint
@@ -23,7 +24,6 @@ router.get('/health', (req, res) => {
  * GET /api/sites
  */
 router.get('/sites', (req, res) => {
-  const { SUPPORTED_SITES } = require('../config/constants');
   res.json(SUPPORTED_SITES);
 });
 

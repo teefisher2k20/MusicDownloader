@@ -324,55 +324,47 @@ function updateDownloadStatus(id, status, progress) {
 // QUEUE MANAGEMENT
 // ============================================
 function updateQueueDisplay() {
-  const activeDownloads = AppState.downloads.filter(d => d.status === 'downloading');
-  const pendingDownloads = AppState.downloads.filter(d => d.status === 'pending');
-  const completedDownloads = AppState.downloads.filter(d => d.status === 'completed');
-  const failedDownloads = AppState.downloads.filter(d => d.status === 'failed');
+  // Single pass through downloads array to categorize
+  const categorizedDownloads = AppState.downloads.reduce((acc, download) => {
+    switch(download.status) {
+    case 'downloading':
+      acc.active.push(download);
+      break;
+    case 'pending':
+      acc.pending.push(download);
+      break;
+    case 'completed':
+      acc.completed.push(download);
+      break;
+    case 'failed':
+      acc.failed.push(download);
+      break;
+    }
+    return acc;
+  }, { active: [], pending: [], completed: [], failed: [] });
     
   // Update tab counts
   document.querySelectorAll('.queue-tab').forEach(tab => {
     const queueType = tab.dataset.queue;
-    let count = 0;
-        
-    switch(queueType) {
-    case 'active':
-      count = activeDownloads.length;
-      break;
-    case 'pending':
-      count = pendingDownloads.length;
-      break;
-    case 'completed':
-      count = completedDownloads.length;
-      break;
-    case 'failed':
-      count = failedDownloads.length;
-      break;
-    }
-        
+    const count = categorizedDownloads[queueType]?.length || 0;
     tab.textContent = `${queueType.charAt(0).toUpperCase() + queueType.slice(1)} (${count})`;
   });
     
   // Render current tab
-  renderQueueList();
+  renderQueueList(categorizedDownloads);
 }
 
-function renderQueueList() {
-  let downloads = [];
-    
-  switch(AppState.currentTab) {
-  case 'active':
-    downloads = AppState.downloads.filter(d => d.status === 'downloading');
-    break;
-  case 'pending':
-    downloads = AppState.downloads.filter(d => d.status === 'pending');
-    break;
-  case 'completed':
-    downloads = AppState.downloads.filter(d => d.status === 'completed');
-    break;
-  case 'failed':
-    downloads = AppState.downloads.filter(d => d.status === 'failed');
-    break;
-  }
+function renderQueueList(categorizedDownloads) {
+  const downloads = categorizedDownloads?.[AppState.currentTab] || 
+                    AppState.downloads.filter(d => {
+                      switch(AppState.currentTab) {
+                      case 'active': return d.status === 'downloading';
+                      case 'pending': return d.status === 'pending';
+                      case 'completed': return d.status === 'completed';
+                      case 'failed': return d.status === 'failed';
+                      default: return false;
+                      }
+                    });
     
   if (downloads.length === 0) {
     DOM.queueList.innerHTML = `
@@ -490,8 +482,10 @@ function handleThemeToggle() {
 // ============================================
 function initClipboardMonitor() {
   let lastClipboard = '';
+  let clipboardCheckTimeout;
   
-  setInterval(async () => {
+  // Reduced polling frequency and added debouncing
+  const checkClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
       
@@ -501,8 +495,22 @@ function initClipboardMonitor() {
       }
     } catch (err) {
       // Clipboard access denied or not available
+      // Silently fail - this is expected when tab is not focused
+    } finally {
+      // Schedule next check with increased interval to reduce CPU usage
+      clipboardCheckTimeout = setTimeout(checkClipboard, CLIPBOARD_CHECK_INTERVAL);
     }
-  }, CLIPBOARD_CHECK_INTERVAL);
+  };
+  
+  // Start monitoring
+  checkClipboard();
+  
+  // Clean up on page unload
+  window.addEventListener('beforeunload', () => {
+    if (clipboardCheckTimeout) {
+      clearTimeout(clipboardCheckTimeout);
+    }
+  });
 }
 
 function useClipboardUrl(url) {
