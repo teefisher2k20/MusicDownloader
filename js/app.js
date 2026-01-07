@@ -114,10 +114,11 @@ function setupEventListeners() {
   });
     
   // Navigation Links
-  document.querySelectorAll('.nav-link').forEach(link => {
+  const navLinks = document.querySelectorAll('.nav-link');
+  navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
             
       const target = link.getAttribute('href');
@@ -344,7 +345,7 @@ function updateQueueDisplay() {
   }, { active: [], pending: [], completed: [], failed: [] });
     
   // Update tab counts
-  document.querySelectorAll('.queue-tab').forEach(tab => {
+  DOM.queueTabs.forEach(tab => {
     const queueType = tab.dataset.queue;
     const count = categorizedDownloads[queueType]?.length || 0;
     tab.textContent = `${queueType.charAt(0).toUpperCase() + queueType.slice(1)} (${count})`;
