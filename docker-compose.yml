@@ -1,0 +1,105 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://vop_user:vop_pass@postgres:5432/vop_db
+      - REDIS_URL=redis://redis:6379/0
+      - STORAGE_BACKEND=local
+      - LOCAL_STORAGE_DIR=/artifacts
+      - RENDER_WORK_DIR=/tmp/renders
+      - LOG_LEVEL=INFO
+      - API_KEY_SECRET=${API_KEY_SECRET:?API_KEY_SECRET must be set — copy .env.example to .env and set a strong value}
+    volumes:
+      - .:/app
+      - artifacts:/artifacts
+      - renders:/tmp/renders
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m app.worker
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://vop_user:vop_pass@postgres:5432/vop_db
+      - REDIS_URL=redis://redis:6379/0
+      - STORAGE_BACKEND=local
+      - LOCAL_STORAGE_DIR=/artifacts
+      - RENDER_WORK_DIR=/tmp/renders
+      - LOG_LEVEL=INFO
+      - API_KEY_SECRET=${API_KEY_SECRET:?API_KEY_SECRET must be set — copy .env.example to .env and set a strong value}
+    volumes:
+      - .:/app
+      - artifacts:/artifacts
+      - renders:/tmp/renders
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vop_user
+      POSTGRES_PASSWORD: vop_pass
+      POSTGRES_DB: vop_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vop_user -d vop_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: alembic upgrade head
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://vop_user:vop_pass@postgres:5432/vop_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  pgdata:
+  redisdata:
+  artifacts:
+  renders:

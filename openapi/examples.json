@@ -1,0 +1,595 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Video Orchestration Platform",
+    "version": "1.0.0",
+    "description": "Programmatic video rendering orchestration API."
+  },
+  "servers": [{ "url": "http://localhost:8000", "description": "Local dev" }],
+  "paths": {
+    "/v1/renders": {
+      "post": {
+        "summary": "Submit a render job",
+        "operationId": "createRender",
+        "tags": ["renders"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "examples": {
+                "sales_personalization": {
+                  "summary": "Sales Personalization Video Bot",
+                  "value": {
+                    "template_id": "sales_personalization",
+                    "template_version": "v1",
+                    "priority": 7,
+                    "idempotency_key": "account-acme-campaign-q3-2026",
+                    "props": {
+                      "account_name": "Acme Corp",
+                      "persona_title": "VP of Engineering",
+                      "pain_point": "Manual release pipelines slow down your team by 40%.",
+                      "proof_point": {
+                        "metric": "43% faster deploys",
+                        "source": "G2 Review, 2025"
+                      },
+                      "cta_text": "Book a 15-min demo",
+                      "industry": "SaaS",
+                      "sender_name": "Jordan Lee",
+                      "duration_seconds": 30,
+                      "aspect_ratio": "16:9",
+                      "brand": {
+                        "primary_color": "#2563EB",
+                        "logo_url": "https://cdn.example.com/logos/acme.png"
+                      }
+                    }
+                  }
+                },
+                "release_trailer": {
+                  "summary": "Product Release Auto-Trailer",
+                  "value": {
+                    "template_id": "release_trailer",
+                    "template_version": "v1",
+                    "priority": 5,
+                    "idempotency_key": "release-v3.4.0-youtube",
+                    "props": {
+                      "version_name": "v3.4.0 - Aurora",
+                      "release_date": "2026-05-04",
+                      "headline": "Faster, smarter, and built for teams at scale.",
+                      "brand_color": "#7C3AED",
+                      "channel": "youtube",
+                      "cta_text": "Explore the release",
+                      "cta_url": "https://example.com/releases/aurora",
+                      "features": [
+                        {
+                          "title": "10x faster CI pipeline",
+                          "description": "New distributed build runner reduces merge-to-deploy from 12 min to 90 seconds.",
+                          "screenshot_url": "https://cdn.example.com/screenshots/ci-v3.4.png",
+                          "impact_tag": "performance",
+                          "priority_rank": 10
+                        },
+                        {
+                          "title": "Redesigned dashboard",
+                          "description": "Cleaner information hierarchy with contextual drill-downs.",
+                          "impact_tag": "ux",
+                          "priority_rank": 7
+                        }
+                      ],
+                      "metrics": {
+                        "commits": 412,
+                        "contributors": 31,
+                        "issues_closed": 88
+                      }
+                    }
+                  }
+                },
+                "shorts_factory": {
+                  "summary": "Creator Shorts Factory",
+                  "value": {
+                    "template_id": "shorts_factory",
+                    "template_version": "v1",
+                    "priority": 5,
+                    "idempotency_key": "ep-42-hook-a-shorts",
+                    "props": {
+                      "source_title": "Episode 42: The Future of Programmatic Video",
+                      "aspect_ratio": "9:16",
+                      "hook_text": "Most developers don't know this about video...",
+                      "creator_handle": "@codewithlee",
+                      "variant_label": "hook-a",
+                      "caption_style": {
+                        "font_family": "Inter",
+                        "font_size": 64,
+                        "highlight_color": "#FACC15",
+                        "outline": true
+                      },
+                      "music_url": "https://cdn.example.com/music/upbeat-lo-fi.mp3",
+                      "music_volume": 0.07,
+                      "segments": [
+                        {
+                          "segment_id": "seg-001",
+                          "start_ms": 124000,
+                          "end_ms": 136000,
+                          "text": "Remotion lets you build videos with React. Every pixel is a function of state and time.",
+                          "hook_score": 0.92
+                        }
+                      ]
+                    }
+                  }
+                },
+                "kpi_morning_brief": {
+                  "summary": "Live KPI Morning Brief",
+                  "value": {
+                    "template_id": "kpi_morning_brief",
+                    "template_version": "v1",
+                    "priority": 9,
+                    "idempotency_key": "brief-emea-2026-05-04",
+                    "props": {
+                      "business_unit": "Revenue - EMEA",
+                      "date_label": "Monday 4 May 2026",
+                      "headline": "EMEA revenue up 8% WoW; pipeline coverage at 2.3x target.",
+                      "brand_color": "#1E3A5F",
+                      "logo_url": "https://cdn.example.com/logos/company.svg",
+                      "metrics": [
+                        {
+                          "label": "ARR",
+                          "value": "$4.2M",
+                          "delta": "+8%",
+                          "trend": "up",
+                          "status": "green",
+                          "unit": "USD"
+                        },
+                        {
+                          "label": "Pipeline",
+                          "value": "2.3x",
+                          "delta": "+0.4x",
+                          "trend": "up",
+                          "status": "green"
+                        },
+                        {
+                          "label": "Churn Rate",
+                          "value": "1.2%",
+                          "delta": "-0.3pp",
+                          "trend": "down",
+                          "status": "amber"
+                        }
+                      ],
+                      "alerts": [
+                        {
+                          "severity": "warning",
+                          "title": "DACH region pipeline thin",
+                          "detail": "Coverage at 1.1x vs 2x target."
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "owner": "Sarah M.",
+                          "action": "Accelerate 3 stalled DACH opportunities",
+                          "due": "EOW"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "student_progress_reels": {
+                  "summary": "Student Progress Reels",
+                  "value": {
+                    "template_id": "student_progress_reels",
+                    "template_version": "v1",
+                    "priority": 4,
+                    "idempotency_key": "student-alex-spring-2026-consent-abc123",
+                    "props": {
+                      "student_display_name": "Alex",
+                      "institution_name": "Northgate University",
+                      "academic_period": "Spring Semester 2026",
+                      "grade_band": "undergraduate",
+                      "gpa_or_equivalent": "3.7 GPA",
+                      "consent_reference_id": "consent-abc-123",
+                      "institution_brand_color": "#003087",
+                      "language_code": "en",
+                      "subjects": [
+                        {
+                          "subject": "Computer Science",
+                          "grade": "A",
+                          "trend": "improving"
+                        },
+                        {
+                          "subject": "Mathematics",
+                          "grade": "B+",
+                          "trend": "stable"
+                        },
+                        {
+                          "subject": "Ethics in AI",
+                          "grade": "A-",
+                          "trend": "improving"
+                        }
+                      ],
+                      "achievements": [
+                        {
+                          "title": "Dean's List",
+                          "icon_key": "star",
+                          "date": "2026-05-01"
+                        }
+                      ],
+                      "goals": [
+                        {
+                          "goal": "Complete capstone project",
+                          "timeframe": "Summer 2026"
+                        }
+                      ],
+                      "advisor_message": "Alex, your growth this semester has been outstanding. Keep up the momentum!"
+                    }
+                  }
+                },
+                "ecommerce_ad_composer": {
+                  "summary": "E-commerce Dynamic Ad Composer",
+                  "value": {
+                    "template_id": "ecommerce_ad_composer",
+                    "template_version": "v1",
+                    "priority": 6,
+                    "idempotency_key": "campaign-summer-sale-meta-sku-001-segment-hi",
+                    "props": {
+                      "campaign_name": "Summer Sale 2026",
+                      "offer_headline": "Up to 40% off this weekend only",
+                      "cta_text": "Shop Now",
+                      "urgency_text": "Offer ends midnight Sunday",
+                      "brand_color": "#E11D48",
+                      "channel": "meta",
+                      "aspect_ratio": "1:1",
+                      "duration_seconds": 15,
+                      "variant_id": "arm-a",
+                      "audience": {
+                        "segment_id": "hi-intent-returners",
+                        "label": "High-intent returners",
+                        "tone": "urgent"
+                      },
+                      "products": [
+                        {
+                          "sku_id": "SKU-001",
+                          "name": "Performance Running Shoe",
+                          "image_url": "https://cdn.example.com/products/shoe-001.jpg",
+                          "price": "$89.99",
+                          "original_price": "$149.99",
+                          "badge": "Sale",
+                          "rating": 4.8,
+                          "review_count": 1240
+                        }
+                      ],
+                      "benefits": [
+                        { "text": "Free next-day shipping" },
+                        { "text": "30-day easy returns" }
+                      ]
+                    }
+                  }
+                },
+                "geo_story_maps": {
+                  "summary": "Geo Story Map Narratives",
+                  "value": {
+                    "template_id": "geo_story_maps",
+                    "template_version": "v1",
+                    "priority": 5,
+                    "idempotency_key": "marathon-london-2026-top-10",
+                    "props": {
+                      "story_title": "London Marathon 2026 - Top 10 Finishers Route",
+                      "mapbox_token": "pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example",
+                      "map_style": "mapbox://styles/mapbox/standard",
+                      "route_line_color": "#EF4444",
+                      "fps": 30,
+                      "duration_seconds": 90,
+                      "output_format": "16:9",
+                      "language_code": "en",
+                      "route_points": [
+                        {
+                          "lat": 51.5014,
+                          "lon": -0.1419,
+                          "timestamp": "2026-04-27T09:00:00Z"
+                        },
+                        {
+                          "lat": 51.5007,
+                          "lon": -0.1245,
+                          "timestamp": "2026-04-27T09:05:00Z"
+                        },
+                        {
+                          "lat": 51.4975,
+                          "lon": -0.0753,
+                          "timestamp": "2026-04-27T10:15:00Z"
+                        }
+                      ],
+                      "events": [
+                        {
+                          "event_id": "start",
+                          "lat": 51.5014,
+                          "lon": -0.1419,
+                          "title": "Start Line - Blackheath",
+                          "icon_key": "flag",
+                          "chapter_number": 1
+                        },
+                        {
+                          "event_id": "finish",
+                          "lat": 51.4975,
+                          "lon": -0.0753,
+                          "title": "Finish Line - The Mall",
+                          "icon_key": "trophy",
+                          "chapter_number": 2
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Job accepted.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "job_id": "3f2a9c1b-4e8d-4b5a-bc3c-9f1e2d3a4567",
+                  "status": "queued",
+                  "created_at": "2026-05-04T08:00:00Z"
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid or missing API key." },
+          "422": { "description": "Validation error in request body." }
+        }
+      },
+      "get": {
+        "summary": "List render jobs",
+        "operationId": "listRenders",
+        "tags": ["renders"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          },
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "template_id",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Paginated job list." }
+        }
+      }
+    },
+    "/v1/renders/{job_id}": {
+      "get": {
+        "summary": "Get render status",
+        "operationId": "getRender",
+        "tags": ["renders"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job status.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "job_id": "3f2a9c1b-4e8d-4b5a-bc3c-9f1e2d3a4567",
+                  "template_id": "sales_personalization",
+                  "template_version": "v1",
+                  "status": "completed",
+                  "progress": 100,
+                  "output_url": "https://cdn.example.com/artifacts/sales_personalization/3f2a9c1b.mp4?token=xxx",
+                  "error_code": null,
+                  "error_message": null,
+                  "retry_count": 0,
+                  "playlist_name": "Launch Week Playlist",
+                  "playlist_actions": [
+                    {
+                      "action_id": "d89b6d54-2a38-4a25-b3b7-6b725e430a99",
+                      "action": "download",
+                      "playlist_name": "Launch Week Playlist",
+                      "destination": "ios-device-teefi",
+                      "status": "queued",
+                      "created_at": "2026-05-04T08:03:00Z"
+                    }
+                  ],
+                  "created_at": "2026-05-04T08:00:00Z",
+                  "updated_at": "2026-05-04T08:02:18Z"
+                }
+              }
+            }
+          },
+          "404": { "description": "Job not found." }
+        }
+      },
+      "delete": {
+        "summary": "Cancel a queued job",
+        "operationId": "cancelRender",
+        "tags": ["renders"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Job canceled." },
+          "409": { "description": "Job cannot be canceled in current state." }
+        }
+      }
+    },
+    "/v1/renders/{job_id}/playlist": {
+      "post": {
+        "summary": "Queue a post-completion playlist action",
+        "operationId": "queuePlaylistAction",
+        "tags": ["renders"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "examples": {
+                "listen": {
+                  "summary": "Queue listen action",
+                  "value": {
+                    "action": "listen",
+                    "playlist_name": "Audio Queue",
+                    "destination": "podcast-app"
+                  }
+                },
+                "export": {
+                  "summary": "Queue export action",
+                  "value": {
+                    "action": "export",
+                    "playlist_name": "Partner Delivery",
+                    "destination": "s3://media-exports/partner-drop"
+                  }
+                },
+                "download": {
+                  "summary": "Queue download action",
+                  "value": {
+                    "action": "download",
+                    "playlist_name": "My Downloads",
+                    "destination": "macbook-pro"
+                  }
+                },
+                "share": {
+                  "summary": "Queue share action",
+                  "value": {
+                    "action": "share",
+                    "playlist_name": "Social Push",
+                    "destination": "youtube-channel-main"
+                  }
+                },
+                "deploy": {
+                  "summary": "Queue deploy action",
+                  "value": {
+                    "action": "deploy",
+                    "playlist_name": "Living Room Screens",
+                    "destination": "roku-living-room"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Playlist action queued.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "job_id": "3f2a9c1b-4e8d-4b5a-bc3c-9f1e2d3a4567",
+                  "status": "completed",
+                  "output_url": "https://cdn.example.com/artifacts/sales_personalization/3f2a9c1b.mp4?token=xxx",
+                  "playlist_name": "Living Room Screens",
+                  "actions": [
+                    {
+                      "action_id": "1e4ac84f-80be-4b0a-9455-1b42de9ce040",
+                      "action": "deploy",
+                      "playlist_name": "Living Room Screens",
+                      "destination": "roku-living-room",
+                      "status": "queued",
+                      "created_at": "2026-05-04T08:03:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": { "description": "Job not found." },
+          "409": {
+            "description": "Job must be completed with output before queueing playlist actions."
+          }
+        }
+      },
+      "get": {
+        "summary": "Get post-completion playlist actions",
+        "operationId": "getPlaylistActions",
+        "tags": ["renders"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist actions for a render job.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "job_id": "3f2a9c1b-4e8d-4b5a-bc3c-9f1e2d3a4567",
+                  "status": "completed",
+                  "output_url": "https://cdn.example.com/artifacts/sales_personalization/3f2a9c1b.mp4?token=xxx",
+                  "playlist_name": "Social Push",
+                  "actions": [
+                    {
+                      "action_id": "8de0bcee-a767-41d9-86f0-f294ac47f8f7",
+                      "action": "share",
+                      "playlist_name": "Social Push",
+                      "destination": "youtube-channel-main",
+                      "status": "queued",
+                      "created_at": "2026-05-04T08:03:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": { "description": "Job not found." }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "operationId": "health",
+        "tags": ["ops"],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": { "status": "ok", "environment": "development" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  }
+}

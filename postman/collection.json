@@ -1,0 +1,595 @@
+{
+  "info": {
+    "name": "Video Orchestration Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "vop-collection-v1",
+    "description": "Full API collection for the Video Orchestration Platform. Requires {{base_url}} and {{api_key}} environment variables."
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "api_key", "value": "changeme" },
+    { "key": "job_id", "value": "" }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "X-API-Key", "type": "string" },
+      { "key": "value", "value": "{{api_key}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Status ok', () => { const b = pm.response.json(); pm.expect(b.status).to.eql('ok'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1 · Sales Personalization Video Bot",
+      "item": [
+        {
+          "name": "Submit render",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Accepted 202', () => pm.response.to.have.status(202));",
+                  "const b = pm.response.json();",
+                  "pm.collectionVariables.set('job_id', b.job_id);",
+                  "pm.test('Has job_id', () => pm.expect(b.job_id).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"sales_personalization\",\n  \"template_version\": \"v1\",\n  \"priority\": 7,\n  \"idempotency_key\": \"account-acme-campaign-q3-{{$randomInt}}\",\n  \"props\": {\n    \"account_name\": \"Acme Corp\",\n    \"persona_title\": \"VP of Engineering\",\n    \"pain_point\": \"Manual release pipelines slow down your team by 40%.\",\n    \"proof_point\": { \"metric\": \"43% faster deploys\", \"source\": \"G2 Review, 2025\" },\n    \"cta_text\": \"Book a 15-min demo\",\n    \"industry\": \"SaaS\",\n    \"sender_name\": \"Jordan Lee\",\n    \"duration_seconds\": 30,\n    \"aspect_ratio\": \"16:9\",\n    \"brand\": { \"primary_color\": \"#2563EB\", \"logo_url\": \"https://cdn.example.com/logos/acme.png\" }\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Poll status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has status field', () => pm.expect(pm.response.json().status).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2 · Product Release Auto-Trailer",
+      "item": [
+        {
+          "name": "Submit render",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Accepted 202', () => pm.response.to.have.status(202));",
+                  "pm.collectionVariables.set('job_id', pm.response.json().job_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"release_trailer\",\n  \"template_version\": \"v1\",\n  \"priority\": 5,\n  \"idempotency_key\": \"release-v3.4.0-youtube-{{$randomInt}}\",\n  \"props\": {\n    \"version_name\": \"v3.4.0 - Aurora\",\n    \"release_date\": \"2026-05-04\",\n    \"headline\": \"Faster, smarter, and built for teams at scale.\",\n    \"brand_color\": \"#7C3AED\",\n    \"channel\": \"youtube\",\n    \"cta_text\": \"Explore the release\",\n    \"cta_url\": \"https://example.com/releases/aurora\",\n    \"features\": [\n      {\n        \"title\": \"10x faster CI pipeline\",\n        \"description\": \"New distributed build runner.\",\n        \"impact_tag\": \"performance\",\n        \"priority_rank\": 10\n      }\n    ]\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 · Creator Shorts Factory",
+      "item": [
+        {
+          "name": "Submit render",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Accepted 202', () => pm.response.to.have.status(202));",
+                  "pm.collectionVariables.set('job_id', pm.response.json().job_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"shorts_factory\",\n  \"template_version\": \"v1\",\n  \"priority\": 5,\n  \"idempotency_key\": \"ep-42-hook-a-{{$randomInt}}\",\n  \"props\": {\n    \"source_title\": \"Episode 42: Programmatic Video\",\n    \"aspect_ratio\": \"9:16\",\n    \"hook_text\": \"Most developers don't know this...\",\n    \"creator_handle\": \"@codewithlee\",\n    \"variant_label\": \"hook-a\",\n    \"caption_style\": {\n      \"font_family\": \"Inter\",\n      \"font_size\": 64,\n      \"highlight_color\": \"#FACC15\",\n      \"outline\": true\n    },\n    \"music_url\": \"https://cdn.example.com/music/upbeat.mp3\",\n    \"music_volume\": 0.07,\n    \"segments\": [\n      {\n        \"segment_id\": \"seg-001\",\n        \"start_ms\": 124000,\n        \"end_ms\": 136000,\n        \"text\": \"Remotion lets you build videos with React.\",\n        \"hook_score\": 0.92\n      }\n    ]\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 · Live KPI Morning Brief",
+      "item": [
+        {
+          "name": "Submit render",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Accepted 202', () => pm.response.to.have.status(202));",
+                  "pm.collectionVariables.set('job_id', pm.response.json().job_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"kpi_morning_brief\",\n  \"template_version\": \"v1\",\n  \"priority\": 9,\n  \"idempotency_key\": \"brief-emea-2026-05-04-{{$randomInt}}\",\n  \"props\": {\n    \"business_unit\": \"Revenue - EMEA\",\n    \"date_label\": \"Monday 4 May 2026\",\n    \"headline\": \"EMEA revenue up 8% WoW.\",\n    \"brand_color\": \"#1E3A5F\",\n    \"metrics\": [\n      { \"label\": \"ARR\", \"value\": \"$4.2M\", \"delta\": \"+8%\", \"trend\": \"up\", \"status\": \"green\", \"unit\": \"USD\" },\n      { \"label\": \"Churn\", \"value\": \"1.2%\", \"delta\": \"-0.3pp\", \"trend\": \"down\", \"status\": \"amber\" }\n    ]\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 · Student Progress Reels",
+      "item": [
+        {
+          "name": "Submit render",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Accepted 202', () => pm.response.to.have.status(202));",
+                  "pm.collectionVariables.set('job_id', pm.response.json().job_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"student_progress_reels\",\n  \"template_version\": \"v1\",\n  \"priority\": 4,\n  \"idempotency_key\": \"student-alex-spring-2026-{{$randomInt}}\",\n  \"props\": {\n    \"student_display_name\": \"Alex\",\n    \"institution_name\": \"Northgate University\",\n    \"academic_period\": \"Spring Semester 2026\",\n    \"grade_band\": \"undergraduate\",\n    \"gpa_or_equivalent\": \"3.7 GPA\",\n    \"consent_reference_id\": \"consent-abc-123\",\n    \"institution_brand_color\": \"#003087\",\n    \"subjects\": [\n      { \"subject\": \"Computer Science\", \"grade\": \"A\", \"trend\": \"improving\" },\n      { \"subject\": \"Mathematics\", \"grade\": \"B+\", \"trend\": \"stable\" }\n    ]\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 · E-commerce Dynamic Ad Composer",
+      "item": [
+        {
+          "name": "Submit render",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Accepted 202', () => pm.response.to.have.status(202));",
+                  "pm.collectionVariables.set('job_id', pm.response.json().job_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"ecommerce_ad_composer\",\n  \"template_version\": \"v1\",\n  \"priority\": 6,\n  \"idempotency_key\": \"summer-sale-meta-sku001-{{$randomInt}}\",\n  \"props\": {\n    \"campaign_name\": \"Summer Sale 2026\",\n    \"offer_headline\": \"Up to 40% off this weekend only\",\n    \"cta_text\": \"Shop Now\",\n    \"urgency_text\": \"Offer ends midnight Sunday\",\n    \"brand_color\": \"#E11D48\",\n    \"channel\": \"meta\",\n    \"aspect_ratio\": \"1:1\",\n    \"duration_seconds\": 15,\n    \"audience\": { \"segment_id\": \"hi-intent-returners\", \"label\": \"High-intent returners\", \"tone\": \"urgent\" },\n    \"products\": [\n      {\n        \"sku_id\": \"SKU-001\",\n        \"name\": \"Performance Running Shoe\",\n        \"image_url\": \"https://cdn.example.com/products/shoe-001.jpg\",\n        \"price\": \"$89.99\",\n        \"original_price\": \"$149.99\",\n        \"badge\": \"Sale\",\n        \"rating\": 4.8\n      }\n    ]\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 · Geo Story Map Narratives",
+      "item": [
+        {
+          "name": "Submit render",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Accepted 202', () => pm.response.to.have.status(202));",
+                  "pm.collectionVariables.set('job_id', pm.response.json().job_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"geo_story_maps\",\n  \"template_version\": \"v1\",\n  \"priority\": 5,\n  \"idempotency_key\": \"marathon-london-2026-{{$randomInt}}\",\n  \"props\": {\n    \"story_title\": \"London Marathon 2026\",\n    \"mapbox_token\": \"pk.example.token\",\n    \"map_style\": \"mapbox://styles/mapbox/standard\",\n    \"route_line_color\": \"#EF4444\",\n    \"fps\": 30,\n    \"duration_seconds\": 90,\n    \"output_format\": \"16:9\",\n    \"route_points\": [\n      { \"lat\": 51.5014, \"lon\": -0.1419, \"timestamp\": \"2026-04-27T09:00:00Z\" },\n      { \"lat\": 51.4975, \"lon\": -0.0753, \"timestamp\": \"2026-04-27T10:15:00Z\" }\n    ],\n    \"events\": [\n      { \"event_id\": \"start\", \"lat\": 51.5014, \"lon\": -0.1419, \"title\": \"Start Line\", \"icon_key\": \"flag\", \"chapter_number\": 1 }\n    ]\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Renders — general",
+      "item": [
+        {
+          "name": "List all renders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/renders?page=1&page_size=20",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "page_size", "value": "20" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has items array', () => pm.expect(pm.response.json().items).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Filter by status=queued",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/renders?status=queued",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"],
+              "query": [{ "key": "status", "value": "queued" }]
+            }
+          }
+        },
+        {
+          "name": "Get render status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 404', () => { pm.expect([200, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel render",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('204 or 409', () => { pm.expect([204, 409, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get render — 404 (invalid id)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/nonexistent-job-id",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "nonexistent-job-id"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit render — 401 (no key)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"template_id\":\"sales_personalization\",\"template_version\":\"v1\",\"props\":{}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Playlist — post-completion distribution",
+      "item": [
+        {
+          "name": "Queue action — listen",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}/playlist",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}", "playlist"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"listen\",\n  \"playlist_name\": \"Audio Queue\",\n  \"destination\": \"podcast-app\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('202 queued or 409 pre-completion', () => { pm.expect([202, 409, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queue action — export",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}/playlist",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}", "playlist"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"export\",\n  \"playlist_name\": \"Partner Delivery\",\n  \"destination\": \"s3://media-exports/partner-drop\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('202 queued or 409 pre-completion', () => { pm.expect([202, 409, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queue action — download",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}/playlist",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}", "playlist"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"download\",\n  \"playlist_name\": \"My Downloads\",\n  \"destination\": \"ios-device-teefi\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('202 queued or 409 pre-completion', () => { pm.expect([202, 409, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queue action — share",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}/playlist",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}", "playlist"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"share\",\n  \"playlist_name\": \"Social Push\",\n  \"destination\": \"youtube-channel-main\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('202 queued or 409 pre-completion', () => { pm.expect([202, 409, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queue action — deploy",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}/playlist",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}", "playlist"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"deploy\",\n  \"playlist_name\": \"Living Room Screens\",\n  \"destination\": \"roku-living-room\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('202 queued or 409 pre-completion', () => { pm.expect([202, 409, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get playlist actions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/renders/{{job_id}}/playlist",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "renders", "{{job_id}}", "playlist"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 404', () => { pm.expect([200, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
