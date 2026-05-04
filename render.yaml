@@ -11,12 +11,11 @@
 #      relevant credentials — the default (local) uses /tmp which is ephemeral.
 
 services:
-
   # ── Managed Redis ──────────────────────────────────────────────────────────
   - type: redis
     name: vop-redis
     plan: free
-    ipAllowList: []   # private — only accessible by services in this Blueprint
+    ipAllowList: [] # private — only accessible by services in this Blueprint
 
   # ── API (web service) ──────────────────────────────────────────────────────
   - type: web
@@ -33,16 +32,16 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: vop-postgres
-          property: connectionString        # app/config.py validator fixes postgres:// → postgresql+asyncpg://
+          property: connectionString # app/config.py validator fixes postgres:// → postgresql+asyncpg://
       - key: REDIS_URL
         fromService:
           type: redis
           name: vop-redis
           property: connectionString
       - key: API_KEY_SECRET
-        sync: false                         # set manually in dashboard — never committed to repo
+        sync: false # set manually in dashboard — never committed to repo
       - key: STORAGE_BACKEND
-        value: local                        # change to s3 or azure for production
+        value: local # change to s3 or azure for production
       - key: LOCAL_STORAGE_DIR
         value: /tmp/artifacts
       - key: RENDER_WORK_DIR
