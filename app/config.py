@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -6,6 +7,14 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = "postgresql+asyncpg://vop_user:vop_pass@localhost:5432/vop_db"
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def fix_db_url_scheme(cls, v: str) -> str:
+        # Render (and some other platforms) inject postgres:// but asyncpg requires postgresql+asyncpg://
+        if isinstance(v, str) and v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        return v
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"

@@ -1,0 +1,29 @@
+# Railway configuration — Video Orchestration Platform
+# https://docs.railway.app/reference/config-as-code
+#
+# This file configures the API service (the default/root service).
+# The worker must be added as a SEPARATE service in the Railway dashboard:
+#   1. New Service → GitHub Repo → same repo
+#   2. Set start command: python -m app.worker
+#   3. Copy the env vars below to that service
+#
+# Required env vars (set in Railway dashboard → Variables):
+#   DATABASE_URL  — copy from the Postgres plugin (Railway auto-injects ${{Postgres.DATABASE_URL}})
+#   REDIS_URL     — copy from the Redis plugin    (Railway auto-injects ${{Redis.REDIS_URL}})
+#   API_KEY_SECRET — set your own strong secret
+#
+# Optional (storage):
+#   STORAGE_BACKEND          = s3 or azure (default: local, ephemeral on Railway)
+#   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY / AWS_REGION / S3_BUCKET
+#   AZURE_STORAGE_CONNECTION_STRING / AZURE_CONTAINER_NAME
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
