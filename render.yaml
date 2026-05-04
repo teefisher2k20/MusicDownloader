@@ -20,7 +20,7 @@ services:
   # ── API (web service) ──────────────────────────────────────────────────────
   - type: web
     name: vop-api
-    env: docker
+    runtime: docker
     dockerfilePath: ./Dockerfile
     dockerCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
     # Runs inside the container before the main process on every deploy
@@ -54,7 +54,7 @@ services:
   # ── Worker (background service) ────────────────────────────────────────────
   - type: worker
     name: vop-worker
-    env: docker
+    runtime: docker
     dockerfilePath: ./Dockerfile
     dockerCommand: python -m app.worker
     plan: free
