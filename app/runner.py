@@ -5,7 +5,9 @@ output artifact path.
 """
 
 import json
+import os
 import subprocess
+from shutil import which
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -23,6 +25,9 @@ class RenderError(Exception):
 # Maps substrings in stderr to structured error codes.
 _STDERR_ERROR_MAP: dict[str, str] = {
     "Cannot find composition": "COMPOSITION_NOT_FOUND",
+    "Could not find a composition": "COMPOSITION_NOT_FOUND",
+    "Could not find entry point": "ENTRYPOINT_NOT_FOUND",
+    "Command failed with ENOENT": "ENTRYPOINT_NOT_FOUND",
     "ENOMEM": "OUT_OF_MEMORY",
     "TIMEOUT": "RENDER_TIMEOUT",
     "JavaScript heap out of memory": "HEAP_EXHAUSTED",
@@ -66,13 +71,11 @@ class RenderRunner:
         with props_file.open("w", encoding="utf-8") as f:
             json.dump(props, f)
 
-        cmd = [
-            "node",
-            self._script_path,
-            "--composition", template_id,
-            "--props", str(props_file),
-            "--output", str(output_file),
-        ]
+        cmd = self._build_render_command(
+            template_id=template_id,
+            props_file=props_file,
+            output_file=output_file,
+        )
 
         logger.info(
             "runner.start",
@@ -118,6 +121,68 @@ class RenderRunner:
         props_file.unlink(missing_ok=True)
 
         return str(output_file)
+
+    def _build_render_command(
+        self,
+        template_id: str,
+        props_file: Path,
+        output_file: Path,
+    ) -> list[str]:
+        """
+        Build a rendering command for the requested template.
+
+        Plan A implementation:
+          - release_trailer prefers real Remotion CLI rendering when configured.
+          - other templates continue through the existing node script contract.
+        """
+        if template_id == "release_trailer":
+            cmd = self._build_release_trailer_command(props_file, output_file)
+            if cmd:
+                return cmd
+
+        # Backward-compatible path used by all other templates for now.
+        return [
+            "node",
+            self._script_path,
+            "--composition", template_id,
+            "--props", str(props_file),
+            "--output", str(output_file),
+        ]
+
+    def _build_release_trailer_command(
+        self,
+        props_file: Path,
+        output_file: Path,
+    ) -> Optional[list[str]]:
+        """
+        Real Remotion render path for the release_trailer hero template.
+
+        Environment contract:
+          - REMOTION_ENTRY: path to Remotion entry file (default: remotion/index.ts)
+          - RELEASE_TRAILER_COMPOSITION: composition ID (default: ReleaseTrailerV1)
+
+        If requirements are not met, returns None and caller falls back.
+        """
+        if which("npx") is None:
+            return None
+
+        remotion_entry = os.getenv("REMOTION_ENTRY", "remotion/index.ts")
+        composition_id = os.getenv("RELEASE_TRAILER_COMPOSITION", "ReleaseTrailerV1")
+        entry_path = Path(remotion_entry)
+        if not entry_path.exists():
+            return None
+
+        return [
+            "npx",
+            "remotion",
+            "render",
+            str(entry_path),
+            composition_id,
+            str(output_file),
+            f"--props={str(props_file)}",
+            "--codec=h264",
+            "--concurrency=1",
+        ]
 
 
 runner = RenderRunner()

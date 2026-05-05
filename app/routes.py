@@ -1,5 +1,7 @@
+from pathlib import Path
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Header
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -19,6 +21,18 @@ from app.queue_service import enqueue_render
 from app.repository import PostgresJobRepository
 
 router = APIRouter(tags=["renders"])
+
+_DOCS_DIR = Path(__file__).resolve().parent.parent / "docs" / "remotion"
+_DOC_WHITELIST = {
+    "ARCHITECTURE.md",
+    "AGENTS.md",
+    "COMPOSITIONS.md",
+    "SCENE_DSL.md",
+    "OPERATIONS.md",
+    "QUALITY_GATES.md",
+    "ROADMAP.md",
+    "INTEGRATIONS.md",
+}
 
 
 # ── Auth guard ────────────────────────────────────────────────────────────────
@@ -269,3 +283,129 @@ async def delete_playlist_action(
         raise HTTPException(status_code=404, detail="Playlist action not found.")
 
     await repo.update(job)
+
+
+@router.get(
+        "/remotion/ideas",
+        response_class=HTMLResponse,
+        summary="Remotion feature ideas and architecture links",
+)
+async def remotion_ideas_ui() -> HTMLResponse:
+        html = """
+        <!doctype html>
+        <html lang=\"en\">
+            <head>
+                <meta charset=\"utf-8\" />
+                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+                <title>Remotion Feature Lab</title>
+                <style>
+                    :root { color-scheme: light; }
+                    body {
+                        margin: 0;
+                        font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+                        background: linear-gradient(120deg, #f8fafc, #e2e8f0);
+                        color: #0f172a;
+                    }
+                    .wrap {
+                        max-width: 1024px;
+                        margin: 0 auto;
+                        padding: 28px 18px 40px;
+                    }
+                    h1 {
+                        margin: 0;
+                        font-size: 2rem;
+                    }
+                    .sub {
+                        margin-top: 8px;
+                        color: #334155;
+                    }
+                    .grid {
+                        margin-top: 18px;
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                        gap: 14px;
+                    }
+                    .card {
+                        background: #ffffff;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 12px;
+                        padding: 14px;
+                        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+                    }
+                    .card h3 {
+                        margin: 0 0 8px;
+                        font-size: 1.02rem;
+                    }
+                    .card p {
+                        margin: 0;
+                        color: #334155;
+                        line-height: 1.4;
+                        font-size: 0.94rem;
+                    }
+                    .links {
+                        margin-top: 24px;
+                        background: #ffffff;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 12px;
+                        padding: 14px;
+                    }
+                    .links a {
+                        display: inline-block;
+                        margin: 6px 8px 0 0;
+                        padding: 8px 10px;
+                        border-radius: 8px;
+                        text-decoration: none;
+                        color: #0f172a;
+                        background: #e2e8f0;
+                    }
+                    .links a:hover { background: #cbd5e1; }
+                </style>
+            </head>
+            <body>
+                <div class=\"wrap\">
+                    <h1>Remotion Feature Lab</h1>
+                    <p class=\"sub\">Plan A first: ship <strong>release_trailer</strong>, then expand to bulk multi-ratio and QA gates.</p>
+
+                    <div class=\"grid\">
+                        <article class=\"card\"><h3>Prompt-to-Playlist Director</h3><p>Generate multiple channel variants from one prompt and enqueue distribution actions automatically.</p></article>
+                        <article class=\"card\"><h3>Scene Graph Compiler</h3><p>Compile JSON timeline blocks into Remotion input props using a strict Scene DSL contract.</p></article>
+                        <article class=\"card\"><h3>Caption Intelligence</h3><p>Apply style modes such as kinetic, karaoke, and lower-third by content type and duration.</p></article>
+                        <article class=\"card\"><h3>Voice Persona Packs</h3><p>Bind brand personas to voice, pacing, and CTA style so output stays consistent across campaigns.</p></article>
+                        <article class=\"card\"><h3>B-roll Autopilot</h3><p>Extract keywords from scripts, source shot candidates, and compose timed cutaway suggestions.</p></article>
+                        <article class=\"card\"><h3>Multi-Ratio Burst</h3><p>Render 16:9, 9:16, and 1:1 outputs from a single parent request while preserving lineage.</p></article>
+                        <article class=\"card\"><h3>Render QA Agent</h3><p>Block playlist publish if hard checks fail: missing artifact, bounds overflow, or invalid timing.</p></article>
+                        <article class=\"card\"><h3>Cost-Aware Planner</h3><p>Estimate render duration and assign queue priority before enqueue to improve throughput.</p></article>
+                    </div>
+
+                    <section class=\"links\">
+                        <strong>Working architecture links</strong><br/>
+                        <a href=\"/v1/remotion/docs/ARCHITECTURE.md\">ARCHITECTURE.md</a>
+                        <a href=\"/v1/remotion/docs/AGENTS.md\">AGENTS.md</a>
+                        <a href=\"/v1/remotion/docs/COMPOSITIONS.md\">COMPOSITIONS.md</a>
+                        <a href=\"/v1/remotion/docs/SCENE_DSL.md\">SCENE_DSL.md</a>
+                        <a href=\"/v1/remotion/docs/OPERATIONS.md\">OPERATIONS.md</a>
+                        <a href=\"/v1/remotion/docs/QUALITY_GATES.md\">QUALITY_GATES.md</a>
+                        <a href=\"/v1/remotion/docs/ROADMAP.md\">ROADMAP.md</a>
+                        <a href=\"/v1/remotion/docs/INTEGRATIONS.md\">INTEGRATIONS.md</a>
+                    </section>
+                </div>
+            </body>
+        </html>
+        """
+        return HTMLResponse(content=html)
+
+
+@router.get(
+        "/remotion/docs/{doc_name}",
+        response_class=PlainTextResponse,
+        summary="Read Remotion architecture docs",
+)
+async def remotion_doc(doc_name: str) -> PlainTextResponse:
+        if doc_name not in _DOC_WHITELIST:
+                raise HTTPException(status_code=404, detail="Document not found.")
+
+        path = _DOCS_DIR / doc_name
+        if not path.exists() or not path.is_file():
+                raise HTTPException(status_code=404, detail="Document not found.")
+
+        return PlainTextResponse(path.read_text(encoding="utf-8"))
