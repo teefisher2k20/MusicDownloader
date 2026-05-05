@@ -26,6 +26,8 @@ class RenderError(Exception):
 _STDERR_ERROR_MAP: dict[str, str] = {
     "Cannot find composition": "COMPOSITION_NOT_FOUND",
     "Could not find a composition": "COMPOSITION_NOT_FOUND",
+    "Composition has validation errors": "COMPOSITION_PROPS_INVALID",
+    "Could not find npm executable": "REMOTION_RUNTIME_MISSING",
     "Could not find entry point": "ENTRYPOINT_NOT_FOUND",
     "Command failed with ENOENT": "ENTRYPOINT_NOT_FOUND",
     "ENOMEM": "OUT_OF_MEMORY",
@@ -131,14 +133,12 @@ class RenderRunner:
         """
         Build a rendering command for the requested template.
 
-        Plan A implementation:
-          - release_trailer prefers real Remotion CLI rendering when configured.
+                Plan A implementation:
+                    - release_trailer uses real Remotion CLI rendering (no fallback).
           - other templates continue through the existing node script contract.
         """
         if template_id == "release_trailer":
-            cmd = self._build_release_trailer_command(props_file, output_file)
-            if cmd:
-                return cmd
+                        return self._build_release_trailer_command(props_file, output_file)
 
         # Backward-compatible path used by all other templates for now.
         return [
@@ -153,7 +153,7 @@ class RenderRunner:
         self,
         props_file: Path,
         output_file: Path,
-    ) -> Optional[list[str]]:
+    ) -> list[str]:
         """
         Real Remotion render path for the release_trailer hero template.
 
@@ -161,16 +161,22 @@ class RenderRunner:
           - REMOTION_ENTRY: path to Remotion entry file (default: remotion/index.ts)
           - RELEASE_TRAILER_COMPOSITION: composition ID (default: ReleaseTrailerV1)
 
-        If requirements are not met, returns None and caller falls back.
+        If requirements are not met, raises RenderError.
         """
         if which("npx") is None:
-            return None
+            raise RenderError(
+                "REMOTION_RUNTIME_MISSING",
+                "npx was not found in PATH. Install Node.js/npm runtime for Remotion rendering.",
+            )
 
         remotion_entry = os.getenv("REMOTION_ENTRY", "remotion/index.ts")
         composition_id = os.getenv("RELEASE_TRAILER_COMPOSITION", "ReleaseTrailerV1")
         entry_path = Path(remotion_entry)
         if not entry_path.exists():
-            return None
+            raise RenderError(
+                "ENTRYPOINT_NOT_FOUND",
+                f"Remotion entry file not found: {entry_path}",
+            )
 
         return [
             "npx",

@@ -1,0 +1,20 @@
+{
+  "name": "video-orchestration-platform-remotion",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Remotion runtime for release_trailer composition",
+  "scripts": {
+    "remotion:studio": "remotion studio remotion/index.ts",
+    "remotion:render:release-trailer": "remotion render remotion/index.ts ReleaseTrailerV1 out/release-trailer.mp4"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.340",
+    "@remotion/cli": "4.0.340",
+    "@remotion/renderer": "4.0.340",
+    "@remotion/zod-types": "4.0.340",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.340",
+    "zod": "3.22.3"
+  }
+}

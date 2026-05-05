@@ -46,3 +46,6 @@ Thumbs.db
 
 # Docker
 *.log
+
+# Node / Remotion
+node_modules/

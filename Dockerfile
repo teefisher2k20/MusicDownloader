@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install Node dependencies for live Remotion rendering
+COPY package.json .
+RUN npm install --omit=dev
+
 # Copy application source
 COPY . .
 
