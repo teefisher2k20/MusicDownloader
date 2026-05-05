@@ -6,6 +6,7 @@ output artifact path.
 
 import json
 import os
+import re
 import subprocess
 from shutil import which
 from pathlib import Path
@@ -42,6 +43,9 @@ def _classify_error(stderr: str) -> str:
         if fragment in stderr:
             return code
     return "RENDER_FAILURE"
+
+
+_PROGRESS_PATTERN = re.compile(r"^REMOTION_PROGRESS:(\d{1,3})$")
 
 
 class RenderRunner:
@@ -89,12 +93,7 @@ class RenderRunner:
         if on_progress:
             on_progress(10)
 
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=settings.worker_job_timeout_seconds,
-        )
+        result = self._run_with_streamed_progress(cmd, on_progress=on_progress)
 
         if on_progress:
             on_progress(70)
@@ -123,6 +122,50 @@ class RenderRunner:
         props_file.unlink(missing_ok=True)
 
         return str(output_file)
+
+    def _run_with_streamed_progress(
+        self,
+        cmd: list[str],
+        on_progress: Optional[Callable[[int], None]],
+    ) -> subprocess.CompletedProcess[str]:
+        """
+        Execute a render command and stream stdout/stderr, mapping progress
+        marker lines to callback updates.
+
+        Progress protocol from renderer script:
+          REMOTION_PROGRESS:<0-100>
+        """
+        output_lines: list[str] = []
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+
+        try:
+            assert process.stdout is not None
+            for raw_line in process.stdout:
+                line = raw_line.rstrip("\n")
+                output_lines.append(line)
+
+                m = _PROGRESS_PATTERN.match(line.strip())
+                if m and on_progress:
+                    pct = max(0, min(100, int(m.group(1))))
+                    on_progress(pct)
+
+            return_code = process.wait(timeout=settings.worker_job_timeout_seconds)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            raise RenderError("RENDER_TIMEOUT", "Render command exceeded timeout.")
+
+        combined = "\n".join(output_lines)
+        return subprocess.CompletedProcess(
+            args=cmd,
+            returncode=return_code,
+            stdout=combined,
+            stderr=combined,
+        )
 
     def _build_render_command(
         self,
@@ -171,6 +214,10 @@ class RenderRunner:
 
         remotion_entry = os.getenv("REMOTION_ENTRY", "remotion/index.ts")
         composition_id = os.getenv("RELEASE_TRAILER_COMPOSITION", "ReleaseTrailerV1")
+        renderer_script = os.getenv(
+            "REMOTION_RENDERER_SCRIPT",
+            "remotion/render-release-trailer.js",
+        )
         entry_path = Path(remotion_entry)
         if not entry_path.exists():
             raise RenderError(
@@ -178,16 +225,24 @@ class RenderRunner:
                 f"Remotion entry file not found: {entry_path}",
             )
 
+        renderer_path = Path(renderer_script)
+        if not renderer_path.exists():
+            raise RenderError(
+                "ENTRYPOINT_NOT_FOUND",
+                f"Remotion renderer script not found: {renderer_path}",
+            )
+
         return [
-            "npx",
-            "remotion",
-            "render",
+            "node",
+            str(renderer_path),
+            "--entry",
             str(entry_path),
+            "--composition",
             composition_id,
+            "--props",
+            str(props_file),
+            "--output",
             str(output_file),
-            f"--props={str(props_file)}",
-            "--codec=h264",
-            "--concurrency=1",
         ]
 
 
