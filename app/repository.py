@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime, timezone
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import JobRecord
 from app.models import RenderJob
@@ -77,14 +77,11 @@ class PostgresJobRepository:
         template_id: Optional[str] = None,
     ) -> tuple[list[RenderJob], int]:
         query = select(JobRecord)
-        count_query = select(JobRecord)
 
         if status:
             query = query.where(JobRecord.status == status)
-            count_query = count_query.where(JobRecord.status == status)
         if template_id:
             query = query.where(JobRecord.template_id == template_id)
-            count_query = count_query.where(JobRecord.template_id == template_id)
 
         query = query.order_by(JobRecord.created_at.desc())
         query = query.offset((page - 1) * page_size).limit(page_size)
@@ -92,7 +89,13 @@ class PostgresJobRepository:
         result = await self._session.execute(query)
         records = result.scalars().all()
 
+        count_query = select(func.count()).select_from(JobRecord)
+        if status:
+            count_query = count_query.where(JobRecord.status == status)
+        if template_id:
+            count_query = count_query.where(JobRecord.template_id == template_id)
+
         count_result = await self._session.execute(count_query)
-        total = len(count_result.scalars().all())
+        total = count_result.scalar_one()
 
         return [_to_domain(r) for r in records], total

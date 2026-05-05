@@ -1,5 +1,12 @@
 import React from "react";
-import { AbsoluteFill, Sequence, spring, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import {
+  AbsoluteFill,
+  Sequence,
+  spring,
+  useCurrentFrame,
+  useVideoConfig,
+  interpolate,
+} from "remotion";
 import { z } from "zod";
 import { zColor } from "@remotion/zod-types";
 
@@ -7,7 +14,9 @@ const featureSchema = z.object({
   title: z.string().min(1).max(80),
   description: z.string().min(1).max(300),
   screenshot_url: z.string().url().optional(),
-  impact_tag: z.enum(["performance", "ux", "security", "api", "infra", "other"]).default("other"),
+  impact_tag: z
+    .enum(["performance", "ux", "security", "api", "infra", "other"])
+    .default("other"),
   priority_rank: z.number().int().min(1).max(10).default(5),
 });
 
@@ -29,7 +38,9 @@ export const releaseTrailerSchema = z.object({
   cta_text: z.string().min(1).max(80).default("Explore the release"),
   cta_url: z.string().url().optional(),
   brand_color: zColor().default("#7C3AED"),
-  channel: z.enum(["youtube", "linkedin", "twitter", "internal"]).default("youtube"),
+  channel: z
+    .enum(["youtube", "linkedin", "twitter", "internal"])
+    .default("youtube"),
 });
 
 type ReleaseTrailerProps = z.infer<typeof releaseTrailerSchema>;
@@ -41,6 +52,89 @@ const slideStyle: React.CSSProperties = {
   alignItems: "center",
   padding: "84px 120px",
   textAlign: "center",
+};
+
+const rootStyle: React.CSSProperties = {
+  backgroundColor: "#0f172a",
+  color: "#f8fafc",
+  fontFamily: "Arial, sans-serif",
+};
+
+const introDateStyle: React.CSSProperties = {
+  fontSize: 16,
+  letterSpacing: 1.2,
+  textTransform: "uppercase",
+  color: "#cbd5e1",
+};
+
+const introVersionStyle: React.CSSProperties = {
+  fontSize: 62,
+  fontWeight: 700,
+  marginTop: 18,
+};
+
+const introHeadlineStyle: React.CSSProperties = {
+  fontSize: 30,
+  color: "#e2e8f0",
+  marginTop: 20,
+  maxWidth: 1280,
+};
+
+const featureTagBaseStyle: React.CSSProperties = {
+  borderRadius: 999,
+  padding: "6px 16px",
+  fontSize: 18,
+  textTransform: "uppercase",
+  letterSpacing: 1,
+};
+
+const featureDescriptionStyle: React.CSSProperties = {
+  marginTop: 16,
+  fontSize: 30,
+  maxWidth: 1200,
+  color: "#cbd5e1",
+};
+
+const metricsNoDataStyle: React.CSSProperties = {
+  marginTop: 24,
+  fontSize: 28,
+  color: "#cbd5e1",
+};
+
+const metricsGridStyle: React.CSSProperties = {
+  marginTop: 28,
+  display: "grid",
+  gap: 14,
+  width: "70%",
+};
+
+const metricRowStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  border: "1px solid #334155",
+  borderRadius: 12,
+  padding: "14px 20px",
+  fontSize: 28,
+};
+
+const metricLabelStyle: React.CSSProperties = {
+  color: "#94a3b8",
+};
+
+const metricValueStyle: React.CSSProperties = {
+  color: "#f8fafc",
+  fontWeight: 700,
+};
+
+const outroTitleStyle: React.CSSProperties = {
+  fontSize: 58,
+  fontWeight: 700,
+};
+
+const outroUrlStyle: React.CSSProperties = {
+  marginTop: 18,
+  fontSize: 24,
+  color: "#cbd5e1",
 };
 
 export const ReleaseTrailerV1: React.FC<ReleaseTrailerProps> = ({
@@ -66,31 +160,28 @@ export const ReleaseTrailerV1: React.FC<ReleaseTrailerProps> = ({
     extrapolateRight: "clamp",
   });
 
-  const orderedFeatures = [...features].sort((a, b) => b.priority_rank - a.priority_rank).slice(0, 3);
+  const orderedFeatures = [...features]
+    .sort((a, b) => b.priority_rank - a.priority_rank)
+    .slice(0, 3);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "#0f172a", color: "#f8fafc", fontFamily: "Arial, sans-serif" }}>
+    <AbsoluteFill style={rootStyle}>
       <Sequence from={0} durationInFrames={introFrames}>
         <AbsoluteFill style={{ ...slideStyle, opacity: introOpacity }}>
-          <div
-            style={{
-              fontSize: 16,
-              letterSpacing: 1.2,
-              textTransform: "uppercase",
-              color: "#cbd5e1",
-            }}
-          >
-            {release_date}
-          </div>
-          <div style={{ fontSize: 62, fontWeight: 700, marginTop: 18 }}>{version_name}</div>
-          <div style={{ fontSize: 30, color: "#e2e8f0", marginTop: 20, maxWidth: 1280 }}>{headline}</div>
+          <div style={introDateStyle}>{release_date}</div>
+          <div style={introVersionStyle}>{version_name}</div>
+          <div style={introHeadlineStyle}>{headline}</div>
         </AbsoluteFill>
       </Sequence>
 
       {orderedFeatures.map((feature, idx) => {
         const from = introFrames + idx * featureFrames;
         return (
-          <Sequence key={feature.title} from={from} durationInFrames={featureFrames}>
+          <Sequence
+            key={feature.title}
+            from={from}
+            durationInFrames={featureFrames}
+          >
             <FeatureSlide
               title={feature.title}
               description={feature.description}
@@ -103,12 +194,17 @@ export const ReleaseTrailerV1: React.FC<ReleaseTrailerProps> = ({
         );
       })}
 
-      <Sequence from={introFrames + orderedFeatures.length * featureFrames} durationInFrames={metricsFrames}>
+      <Sequence
+        from={introFrames + orderedFeatures.length * featureFrames}
+        durationInFrames={metricsFrames}
+      >
         <MetricsSlide metrics={metrics} color={brand_color} />
       </Sequence>
 
       <Sequence
-        from={introFrames + orderedFeatures.length * featureFrames + metricsFrames}
+        from={
+          introFrames + orderedFeatures.length * featureFrames + metricsFrames
+        }
         durationInFrames={outroFrames}
       >
         <OutroSlide ctaText={cta_text} ctaUrl={cta_url} color={brand_color} />
@@ -131,66 +227,64 @@ const FeatureSlide: React.FC<{
     config: { damping: 100, mass: 0.7 },
   });
 
+  const featureTagStyle: React.CSSProperties = {
+    ...featureTagBaseStyle,
+    backgroundColor: `${color}30`,
+    border: `1px solid ${color}`,
+  };
+
+  const featureTitleStyle: React.CSSProperties = {
+    marginTop: 24,
+    fontSize: 52,
+    fontWeight: 700,
+    transform: `scale(${0.92 + reveal * 0.08})`,
+    color,
+  };
+
   return (
     <AbsoluteFill style={slideStyle}>
-      <div
-        style={{
-          backgroundColor: `${color}30`,
-          border: `1px solid ${color}`,
-          borderRadius: 999,
-          padding: "6px 16px",
-          fontSize: 18,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-        }}
-      >
-        {impactTag}
-      </div>
-      <div
-        style={{
-          marginTop: 24,
-          fontSize: 52,
-          fontWeight: 700,
-          transform: `scale(${0.92 + reveal * 0.08})`,
-          color,
-        }}
-      >
-        {title}
-      </div>
-      <div style={{ marginTop: 16, fontSize: 30, maxWidth: 1200, color: "#cbd5e1" }}>{description}</div>
+      <div style={featureTagStyle}>{impactTag}</div>
+      <div style={featureTitleStyle}>{title}</div>
+      <div style={featureDescriptionStyle}>{description}</div>
     </AbsoluteFill>
   );
 };
 
-const MetricsSlide: React.FC<{ metrics: ReleaseTrailerProps["metrics"]; color: string }> = ({ metrics, color }) => {
+const MetricsSlide: React.FC<{
+  metrics: ReleaseTrailerProps["metrics"];
+  color: string;
+}> = ({ metrics, color }) => {
   const rows = [
     ["Commits", metrics?.commits],
     ["Contributors", metrics?.contributors],
     ["Issues Closed", metrics?.issues_closed],
-    ["Adoption", metrics?.adoption_percent != null ? `${metrics.adoption_percent}%` : undefined],
+    [
+      "Adoption",
+      metrics?.adoption_percent != null
+        ? `${metrics.adoption_percent}%`
+        : undefined,
+    ],
   ].filter(([, value]) => value != null);
+
+  const metricsHeadingStyle: React.CSSProperties = {
+    fontSize: 40,
+    fontWeight: 700,
+    color,
+  };
 
   return (
     <AbsoluteFill style={slideStyle}>
-      <div style={{ fontSize: 40, fontWeight: 700, color }}>Release Metrics</div>
+      <div style={metricsHeadingStyle}>Release Metrics</div>
       {rows.length === 0 ? (
-        <div style={{ marginTop: 24, fontSize: 28, color: "#cbd5e1" }}>No metrics provided for this release.</div>
+        <div style={metricsNoDataStyle}>
+          No metrics provided for this release.
+        </div>
       ) : (
-        <div style={{ marginTop: 28, display: "grid", gap: 14, width: "70%" }}>
+        <div style={metricsGridStyle}>
           {rows.map(([label, value]) => (
-            <div
-              key={label}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                border: "1px solid #334155",
-                borderRadius: 12,
-                padding: "14px 20px",
-                fontSize: 28,
-              }}
-            >
-              <span style={{ color: "#94a3b8" }}>{label}</span>
-              <span style={{ color: "#f8fafc", fontWeight: 700 }}>{String(value)}</span>
+            <div key={label} style={metricRowStyle}>
+              <span style={metricLabelStyle}>{label}</span>
+              <span style={metricValueStyle}>{String(value)}</span>
             </div>
           ))}
         </div>
@@ -199,24 +293,26 @@ const MetricsSlide: React.FC<{ metrics: ReleaseTrailerProps["metrics"]; color: s
   );
 };
 
-const OutroSlide: React.FC<{ ctaText: string; ctaUrl?: string; color: string }> = ({ ctaText, ctaUrl, color }) => {
+const OutroSlide: React.FC<{
+  ctaText: string;
+  ctaUrl?: string;
+  color: string;
+}> = ({ ctaText, ctaUrl, color }) => {
+  const ctaButtonStyle: React.CSSProperties = {
+    marginTop: 28,
+    fontSize: 34,
+    fontWeight: 700,
+    color: "#0f172a",
+    backgroundColor: color,
+    borderRadius: 14,
+    padding: "14px 24px",
+  };
+
   return (
     <AbsoluteFill style={slideStyle}>
-      <div style={{ fontSize: 58, fontWeight: 700 }}>Ready to upgrade?</div>
-      <div
-        style={{
-          marginTop: 28,
-          fontSize: 34,
-          fontWeight: 700,
-          color: "#0f172a",
-          backgroundColor: color,
-          borderRadius: 14,
-          padding: "14px 24px",
-        }}
-      >
-        {ctaText}
-      </div>
-      {ctaUrl ? <div style={{ marginTop: 18, fontSize: 24, color: "#cbd5e1" }}>{ctaUrl}</div> : null}
+      <div style={outroTitleStyle}>Ready to upgrade?</div>
+      <div style={ctaButtonStyle}>{ctaText}</div>
+      {ctaUrl ? <div style={outroUrlStyle}>{ctaUrl}</div> : null}
     </AbsoluteFill>
   );
 };

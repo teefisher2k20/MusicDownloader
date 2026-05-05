@@ -37,7 +37,7 @@ async def health() -> dict:
 
 @app.get("/", response_class=HTMLResponse, tags=["ui"])
 async def index() -> HTMLResponse:
-        html = """
+    html = """
         <!doctype html>
         <html lang=\"en\">
             <head>
@@ -86,4 +86,4 @@ async def index() -> HTMLResponse:
             </body>
         </html>
         """
-        return HTMLResponse(content=html)
+    return HTMLResponse(content=html)

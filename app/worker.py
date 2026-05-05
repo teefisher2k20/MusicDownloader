@@ -9,6 +9,7 @@ Retry policy:
 """
 
 import asyncio
+import importlib
 from datetime import datetime, timezone
 from arq import Worker
 from arq.connections import RedisSettings
@@ -125,7 +126,6 @@ def _validate_props(job: RenderJob) -> None:
     Schema modules live in app/schemas/<template_id>.py.
     """
     try:
-        import importlib
         module = importlib.import_module(f"app.schemas.{job.template_id}")
         schema_cls = getattr(module, "PropsSchema")
         schema_cls.model_validate(job.props)
@@ -133,7 +133,6 @@ def _validate_props(job: RenderJob) -> None:
         # No schema module means no validation (pass-through)
         pass
     except Exception as exc:
-        from app.runner import RenderError
         raise RenderError("SCHEMA_VALIDATION_ERROR", str(exc)) from exc
 
 

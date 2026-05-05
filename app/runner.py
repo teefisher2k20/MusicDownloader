@@ -176,12 +176,12 @@ class RenderRunner:
         """
         Build a rendering command for the requested template.
 
-                Plan A implementation:
-                    - release_trailer uses real Remotion CLI rendering (no fallback).
+        Plan A implementation:
+          - release_trailer uses real Remotion CLI rendering (no fallback).
           - other templates continue through the existing node script contract.
         """
         if template_id == "release_trailer":
-                        return self._build_release_trailer_command(props_file, output_file)
+            return self._build_release_trailer_command(props_file, output_file)
 
         # Backward-compatible path used by all other templates for now.
         return [

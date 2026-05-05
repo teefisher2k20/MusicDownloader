@@ -1,5 +1,9 @@
+import React from "react";
 import { Composition } from "remotion";
-import { ReleaseTrailerV1, releaseTrailerSchema } from "./compositions/ReleaseTrailerV1";
+import {
+  ReleaseTrailerV1,
+  releaseTrailerSchema,
+} from "./compositions/ReleaseTrailerV1";
 
 export const RemotionRoot: React.FC = () => {
   return (

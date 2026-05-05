@@ -286,12 +286,12 @@ async def delete_playlist_action(
 
 
 @router.get(
-        "/remotion/ideas",
-        response_class=HTMLResponse,
-        summary="Remotion feature ideas and architecture links",
+    "/remotion/ideas",
+    response_class=HTMLResponse,
+    summary="Remotion feature ideas and architecture links",
 )
 async def remotion_ideas_ui() -> HTMLResponse:
-        html = """
+    html = """
         <!doctype html>
         <html lang=\"en\">
             <head>
@@ -392,20 +392,20 @@ async def remotion_ideas_ui() -> HTMLResponse:
             </body>
         </html>
         """
-        return HTMLResponse(content=html)
+    return HTMLResponse(content=html)
 
 
 @router.get(
-        "/remotion/docs/{doc_name}",
-        response_class=PlainTextResponse,
-        summary="Read Remotion architecture docs",
+    "/remotion/docs/{doc_name}",
+    response_class=PlainTextResponse,
+    summary="Read Remotion architecture docs",
 )
 async def remotion_doc(doc_name: str) -> PlainTextResponse:
-        if doc_name not in _DOC_WHITELIST:
-                raise HTTPException(status_code=404, detail="Document not found.")
+    if doc_name not in _DOC_WHITELIST:
+        raise HTTPException(status_code=404, detail="Document not found.")
 
-        path = _DOCS_DIR / doc_name
-        if not path.exists() or not path.is_file():
-                raise HTTPException(status_code=404, detail="Document not found.")
+    path = _DOCS_DIR / doc_name
+    if not path.exists() or not path.is_file():
+        raise HTTPException(status_code=404, detail="Document not found.")
 
-        return PlainTextResponse(path.read_text(encoding="utf-8"))
+    return PlainTextResponse(path.read_text(encoding="utf-8"))

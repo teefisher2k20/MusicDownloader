@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 
@@ -42,7 +42,7 @@ class RenderCreateRequest(BaseModel):
         examples=["v1"],
         description="Semver or named version of the template.",
     )
-    props: Dict[str, Any] = Field(
+    props: dict[str, Any] = Field(
         description="Template-specific input props. Must satisfy the template's schema.",
         examples=[{"account_name": "Acme Corp", "persona": "VP of Engineering"}],
     )
@@ -107,7 +107,7 @@ class PlaylistActionRecord(BaseModel):
     playlist_name: str
     destination: Optional[str] = None
     status: str = "queued"
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class PlaylistActionResponse(BaseModel):
@@ -124,7 +124,7 @@ class RenderJob(BaseModel):
     job_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     template_id: str
     template_version: str
-    props: Dict[str, Any]
+    props: dict[str, Any]
     priority: int = 5
     idempotency_key: str
     status: JobStatus = JobStatus.queued
@@ -136,7 +136,7 @@ class RenderJob(BaseModel):
     playlist_name: Optional[str] = None
     playlist_actions: list[PlaylistActionRecord] = Field(default_factory=list)
     completed_at: Optional[datetime] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = {"from_attributes": True}
